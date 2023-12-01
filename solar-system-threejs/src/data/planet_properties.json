@@ -1,0 +1,47 @@
+{
+  "Mercury": {
+    "id": 199,
+    "radius": 2440,
+    "mass": 3.302e23
+  },
+  "Venus": {
+    "id": 299,
+    "radius": 6051.84,
+    "mass": 48.685e23
+  },
+  "Earth": {
+    "id": 399,
+    "radius": 6371.01,
+    "mass": 5.97219e24
+  },
+  "Mars": {
+    "id": 499,
+    "radius": 3389.92,
+    "mass": 6.4171e23
+  },
+  "Jupiter": {
+    "id": 599,
+    "radius": 69911,
+    "mass": 189818.722e22
+  },
+  "Saturn": {
+    "id": 699,
+    "radius": 58232,
+    "mass": 5.6834e26
+  },
+  "Uranus": {
+    "id": 799,
+    "radius": 25362,
+    "mass": 86.813e24
+  },
+  "Neptune": {
+    "id": 899,
+    "radius": 24624,
+    "mass": 102.409e24
+  },
+  "Pluto": {
+    "id": 999,
+    "radius": 1188.3,
+    "mass": 1.307e22
+  }
+}
