@@ -54,10 +54,10 @@ def get_planet_positions_from_sun_csv(start_date, end_date, time_step, planet, o
         file.write(cleaned_data)
 
 
-def get_multiple_planet_position_from_sun(start_date="1985-01-01", end_date="1985-12-31", output_folder="./data"):
+def get_multiple_planet_position_from_sun(start_date="1985-01-01", end_date="1985-12-31", time_step="1d", output_folder="./data"):
     for planet in planets:
         get_planet_positions_from_sun_csv(
-            start_date, end_date, "1d", planet, output_folder)
+            start_date, end_date, time_step, planet, output_folder)
 
 
 def convert_julian_date(julian_date):
@@ -88,23 +88,31 @@ def create_json_file_with_planet_positions_from_csv_files(csv_folder):
         if csv_file.endswith(".csv"):
             planet = csv_file.split("_")[0]
 
-            df = pd.read_csv(f"./data/{csv_file}",
-                             sep=",", header=None)
+            path = f"{csv_folder}/{csv_file}"
+            try:
+                df = pd.read_csv(path, sep=",", header=None)
+                df = df.rename(columns=col_names)
 
-            df = df.rename(columns=col_names)
+                print(df)
 
-            for _, row in df.iterrows():
-                date = convert_julian_date(row["date_julian"])
+                for _, row in df.iterrows():
+                    date = convert_julian_date(row["date_julian"])
 
-                if date not in planet_position_dict:
-                    planet_position_dict[date] = {}
+                    if date not in planet_position_dict:
+                        planet_position_dict[date] = {}
 
-                planet_position_dict[date][planet] = [
-                    row["position_x"], row["position_y"], row["position_z"]]
+                    planet_position_dict[date][planet] = [
+                        row["position_x"], row["position_y"], row["position_z"]]
+            except Exception as e:
+                print(f"Error reading {csv_file}: {e}")
                 
-    with open("./planet_position.json", "w") as json_file:
-        json.dump(planet_position_dict, json_file)
+        with open("./planet_position.json", "w") as json_file:
+            json.dump(planet_position_dict, json_file)
+
+
 
 # get_planet_positions_from_sun_csv("1985-01-01", "1985-01-31", "1d", "Earth", "./data")
-# get_multiple_planet_position_from_sun()
-create_json_file_with_planet_positions_from_csv_files("./data")
+
+
+# get_multiple_planet_position_from_sun(start_date="1800-01-01", end_date="2099-12-31", time_step="5d", output_folder="./data/1500-2099_5d")
+create_json_file_with_planet_positions_from_csv_files("./data/1500-2099_5d")

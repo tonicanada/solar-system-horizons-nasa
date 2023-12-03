@@ -1,13 +1,11 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import planets from "./data/planet_properties.json";
-import planet_positions from "./data/planet_position.json";
-import { generarArrayFechas } from "./utils.js";
+import planet_positions from "./data/planet_position_1800-2099_5d";
+import { dateBlade } from "./menu.js";
 
 // SCENE
 const scene = new THREE.Scene();
-
-// TEXTURES
 
 // Add objects to the scene
 
@@ -16,7 +14,7 @@ const pointGeometry = new THREE.BufferGeometry();
 pointGeometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
 const sunMaterial = new THREE.PointsMaterial({
-  size: 10,
+  size: 8,
   color: "orange",
   sizeAttenuation: false,
 });
@@ -25,13 +23,10 @@ scene.add(sun);
 sun.position.set(0, 0, 0);
 
 const planetMaterial = new THREE.PointsMaterial({
-  size: 25000,
+  size: 5,
   color: 0xffffff,
   sizeAttenuation: false,
 });
-
-const startDate = "1985-01-01";
-const endDate = "1985-12-31";
 
 const createPlanet = () => {
   const planetPoints = new THREE.Points(pointGeometry, planetMaterial);
@@ -45,18 +40,30 @@ for (let planet of planetNames) {
   scene.add(planetMeshes[planet]);
 }
 
-const dates = generarArrayFechas(startDate, endDate);
-
 // Crear órbitas para cada planeta
-const planetOrbits = {};
+
+const planet_orbits = {};
+for (let day in planet_positions) {
+  for (let planet of planetNames) {
+    if (planet_orbits[planet]) {
+      planet_orbits[planet].push(planet_positions[day][planet]);
+    } else {
+      planet_orbits[planet] = [planet_positions[day][planet]];
+    }
+  }
+}
+
+const drawOrbit = (planet) => {
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(planet_orbits[planet].flat());
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const material = new THREE.LineBasicMaterial({ color: "gray" });
+  const line = new THREE.Line(geometry, material);
+  scene.add(line);
+};
+
 for (let planet of planetNames) {
-  const orbitGeometry = new THREE.BufferGeometry();
-  const orbitPositions = new Float32Array(dates.length * 3); // Un punto por cada fecha
-  orbitGeometry.setAttribute("position", new THREE.BufferAttribute(orbitPositions, 3));
-  const orbitMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
-  const orbit = new THREE.Line(orbitGeometry, orbitMaterial);
-  scene.add(orbit);
-  planetOrbits[planet] = { orbit, positions: orbitPositions, index: 0 };
+  drawOrbit(planet);
 }
 
 // Lights
@@ -68,9 +75,10 @@ const camera = new THREE.PerspectiveCamera(
   35,
   window.innerWidth / window.innerHeight,
   0.1,
-  1000000000000
+  1e12
 );
-camera.position.z = 10000000000;
+
+camera.position.z = 1e10;
 camera.position.y = 5;
 
 // initialize the renderer
@@ -92,51 +100,51 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-console.log(dates.length);
+const updatePositions = (day) => {
+  console.log(day);
 
-console.log(planetNames);
+  for (let planet of planetNames) {
+    let currentPlanetMesh = planetMeshes[planet];
 
-const renderloop = (index) => {
-  if (index < dates.length) {
-    const day = dates[index];
-
-    const sunDistance = camera.position.distanceTo(sun.position);
-    const sunSize = 50000000 / sunDistance;
-    sun.geometry.attributes.position.array[0] = sunSize;
-    sun.geometry.attributes.position.needsUpdate = true;
-
-    for (let planet of planetNames) {
-      let currentPlanetMesh = planetMeshes[planet];
-
-      const distance = camera.position.distanceTo(currentPlanetMesh.position);
-      const pointSize = 25000000000 / distance;
+    if (planet_positions[day]) {
       currentPlanetMesh.position.x = planet_positions[day][planet][0];
       currentPlanetMesh.position.y = planet_positions[day][planet][1];
       currentPlanetMesh.position.z = planet_positions[day][planet][2];
-      currentPlanetMesh.material.size = pointSize;
-
-      // Actualizar la posición del planeta
-      const planetOrbit = planetOrbits[planet];
-      const { positions, index: currentIndex } = planetOrbit;
-      positions[currentIndex * 3] = currentPlanetMesh.position.x;
-      positions[currentIndex * 3 + 1] = currentPlanetMesh.position.y;
-      positions[currentIndex * 3 + 2] = currentPlanetMesh.position.z;
-      planetOrbit.orbit.geometry.setDrawRange(0, currentIndex + 1);
-      planetOrbit.orbit.geometry.attributes.position.needsUpdate = true;
-      planetOrbit.index += 1;
     }
-    
-
-    // Renderiza la escena
-    renderer.render(scene, camera);
-    window.requestAnimationFrame(renderloop);
-
-    // Llama a la función renderloop con el siguiente índice después de 1000 milisegundos (1 segundo)
-    setTimeout(() => {
-      renderloop(index + 1);
-    }, 100);
   }
 };
 
-// Comienza la animación con el primer índice
-renderloop(0);
+updatePositions(0);
+
+// Añade el evento onchange al slider
+dateBlade.on("change", (event) => {
+  const newValue = event.value.split(" ")[0];
+  // Realiza las acciones que desees con el nuevo valor
+  updatePositions(newValue);
+});
+
+// RENDERLOOP
+// render the scene
+const renderloop = () => {
+  // controls.update();
+  const sunDistance = camera.position.distanceTo(sun.position);
+  const sunSize = 5e7 / sunDistance;
+  sun.geometry.attributes.position.array[0] = sunSize;
+  sun.geometry.attributes.position.needsUpdate = true;
+
+  for (let planet of planetNames) {
+    let currentPlanetMesh = planetMeshes[planet];
+
+    const distance = camera.position.distanceTo(currentPlanetMesh.position);
+    const pointSize = 5e7 / distance;
+    currentPlanetMesh.geometry.attributes.position.array[0] = pointSize;
+    currentPlanetMesh.geometry.attributes.position.needsUpdate = true;
+
+    // planetOrbit.index += 1;
+  }
+
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(renderloop);
+};
+
+renderloop();
