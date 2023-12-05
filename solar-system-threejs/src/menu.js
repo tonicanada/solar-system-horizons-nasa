@@ -1,5 +1,5 @@
 import { Pane } from "tweakpane";
-import { addDays, format } from "date-fns";
+import { addDays, addYears, format } from "date-fns";
 
 const pane = new Pane();
 
@@ -10,15 +10,21 @@ const menuFolder = pane.addFolder({
 const getDate = (year, dayOfYear) => {
   const era = year >= 1 ? "AC" : "BC";
   let date = new Date(year, 0, 1);
+  if (year >=0 && year <=100) {
+    date = addYears(date, -1900)
+  }
+
+
   date = addDays(date, dayOfYear - 1);
   const dateFormatted = format(date, `yyyy-MM-dd`);
-  return dateFormatted + " " + era;
+  const dateFotmattedWithBcAc = era === "AC" ? dateFormatted : "-" + dateFormatted
+  return dateFotmattedWithBcAc;
 };
 
 const yearBlade = pane.addBlade({
   view: "slider",
   label: "year",
-  min: -2099,
+  min: -1999,
   max: 2099,
   value: 2023,
 });
@@ -28,7 +34,7 @@ const dayBlade = pane.addBlade({
   label: "day",
   min: 1,
   max: 366,
-  value: 1,
+  value: 335,
 });
 
 const dateBlade = pane.addBlade({
@@ -39,10 +45,13 @@ const dateBlade = pane.addBlade({
   value: getDate(yearBlade.value, dayBlade.value),
 });
 
+
 const updateSliderBladeValue = () => {
   const dateValue = getDate(yearBlade.value, dayBlade.value);
   dateBlade.value = dateValue;
 };
+
+
 
 yearBlade.on("change", updateSliderBladeValue);
 dayBlade.on("change", updateSliderBladeValue);
