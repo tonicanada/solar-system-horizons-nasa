@@ -14,4 +14,6 @@ npm run dev
 
 This will allow you to view the app on some localhost port.
 
+You can view the website in production at https://tonicanada.github.io/solar-system-threejs/.
+
 For more information, read the following article.
