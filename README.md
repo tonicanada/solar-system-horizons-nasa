@@ -1,4 +1,4 @@
-# Building a Solar Sytem with Nasa Horizons API and three.js
+# Building a Solar System with Nasa Horizons API and three.js
 
 This repository has 2 main folders, one written in Python that queries data from the [NASA Horizons API](https://ssd-api.jpl.nasa.gov/doc/horizons.html), and another one that is a web app in Vite with Three.js.
 
