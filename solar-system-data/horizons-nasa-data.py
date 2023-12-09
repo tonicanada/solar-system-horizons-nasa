@@ -2,7 +2,6 @@ import requests
 from pathlib import Path
 import ephem
 import pandas as pd
-from datetime import datetime
 import os
 import json
 
@@ -44,8 +43,6 @@ def check_start_date_ephem_by_planet(start_date, planet):
 
 def convert_from_juliandate(julian_date):
     date_ephem = ephem.date(julian_date - 2415020)
-    # date_str = datetime.strptime(str(date_ephem), "%Y/%m/%d %H:%M:%S")
-    # date_str = date_str.strftime("%Y-%m-%d")
     date_str = str(date_ephem).split()[0]
     year, month, day = map(int, date_str.split('/'))
     if str(year).startswith("-"):
@@ -158,4 +155,6 @@ def create_json_file_with_planet_positions_from_csv_files(csv_folder):
 #     start_date="1751-01-01", end_date="2099-12-31", time_step="5d", output_folder="./data/ac/1751-2099_5d")
 
 
-create_json_file_with_planet_positions_from_csv_files("./data/ac/1751-2099_5d")
+# create_json_file_with_planet_positions_from_csv_files("./data/ac/1751-2099_5d")
+
+

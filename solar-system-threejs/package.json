@@ -6,14 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "postinstall": "npm run build",
+    "preview": "vite preview",
+    "serve-heroku": "vite --host 0.0.0.0 --port $PORT preview"
   },
   "devDependencies": {
     "vite": "^5.0.0"
   },
   "dependencies": {
     "date-fns": "^2.30.0",
-    "julian": "^0.2.0",
     "three": "^0.158.0",
     "tweakpane": "^4.0.1"
   }

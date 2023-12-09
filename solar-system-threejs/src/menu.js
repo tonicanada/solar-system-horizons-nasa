@@ -1,5 +1,7 @@
 import { Pane } from "tweakpane";
 import { addDays, addYears, format } from "date-fns";
+const isMobile = window.innerWidth <= 768;
+
 
 const pane = new Pane();
 
